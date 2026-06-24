@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to Table & Chart Demo</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .config-section {
+            margin-bottom: 30px;
+            background: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        textarea {
+            width: 100%;
+            height: 180px;
+            font-family: monospace;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            padding: 10px;
+        }
+        button {
+            background-color: #007bef;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        #chart-container {
+            width: 100%;
+            height: 400px;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Data Input (JSON)</h2>
+    <div class="config-section">
+        <textarea id="json-input">[
+  { "date": "01/01/2026", "traffic": 4320 },
+  { "date": "02/01/2026", "traffic": 7850 },
+  { "date": "03/01/2026", "traffic": 5120 },
+  { "date": "04/01/2026", "traffic": 6980 },
+  { "date": "05/01/2026", "traffic": 3410 },
+  { "date": "06/01/2026", "traffic": 8290 },
+  { "date": "07/01/2026", "traffic": 4960 },
+  { "date": "08/01/2026", "traffic": 6150 },
+  { "date": "09/01/2026", "traffic": 7030 },
+  { "date": "10/01/2026", "traffic": 5890 }
+]</textarea>
+        <button id="render-btn">Generate Table & Chart</button>
+        <div id="error-msg" class="error"></div>
+    </div>
+
+    <h2>Traffic Table</h2>
+    <table id="traffic-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Traffic</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+
+    <div id="chart-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const jsonInput = document.getElementById('json-input');
+            const renderBtn = document.getElementById('render-btn');
+            const tableBody = document.querySelector('#traffic-table tbody');
+            const errorMsg = document.getElementById('error-msg');
+
+            function updateUI() {
+                errorMsg.innerText = '';
+                
+                try {
+                    // 1. Parse the JSON from textbox
+                    const data = JSON.parse(jsonInput.value);
+                    
+                    // Clear existing table rows
+                    tableBody.innerHTML = '';
+                    
+                    const dates = [];
+                    const trafficData = [];
+
+                    // 2. Loop through JSON to build table and populate chart arrays
+                    data.forEach(item => {
+                        dates.push(item.date);
+                        trafficData.push(Number(item.traffic));
+
+                        const row = `<tr>
+                            <td>${item.date}</td>
+                            <td>${item.traffic}</td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+
+                    // 3. Render Highcharts
+                    Highcharts.chart('chart-container', {
+                        chart: { type: 'line' },
+                        title: { text: 'Daily Traffic Overview' },
+                        xAxis: { categories: dates },
+                        yAxis: { title: { text: 'Traffic' } },
+                        series: [{
+                            name: 'Traffic',
+                            data: trafficData,
+                            color: '#007bef'
+                        }],
+                        credits: { enabled: false }
+                    });
+
+                } catch (e) {
+                    errorMsg.innerText = 'Invalid JSON format. Please check your data structure.';
+                }
+            }
+
+            // Run once on load, and set up the button click event
+            renderBtn.addEventListener('click', updateUI);
+            updateUI();
+        });
+    </script>
+</body>
+</html>
