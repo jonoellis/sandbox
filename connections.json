@@ -1,0 +1,22 @@
+[
+  {
+    "category": "CMYK COLOURS",
+    "color": "yellow",
+    "items": ["CYAN", "MAGENTA", "YELLOW", "BLACK"]
+  },
+  {
+    "category": "DIRECTIONS",
+    "color": "green",
+    "items": ["UP", "DOWN", "LEFT", "RIGHT"]
+  },
+  {
+    "category": "TYPES OF TRUCK",
+    "color": "blue",
+    "items": ["LORRY", "TRUCK", "TANKER", "ARCTIC"]
+  },
+  {
+    "category": "SHAPES",
+    "color": "purple",
+    "items": ["CIRCLE", "SQUARE", "TRIANGLE", "PENTAGON"]
+  }
+]
