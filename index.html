@@ -26,11 +26,10 @@
     <h3>Response:</h3>
     <div id="output"></div>
 
-    <!-- Import WebLLM from a High-Quality CDN -->
+    <!-- Changed to unpkg with an explicit bundle path to bypass jsdelivr redirect restrictions -->
     <script type="module">
-        import * as webllm from "https://esm.run";
+        import * as webllm from "https://unpkg.com";
 
-        // Switched to Hugging Face's ultra-lightweight SmolLM2-360M model
         const selectedModel = "SmolLM2-360M-Instruct-q4f16_1-MLC";
         let engine;
 
@@ -50,7 +49,6 @@
             logDiv.innerText = "Loading WebGPU Engine and pulling SmolLM2 from Hugging Face...";
             
             try {
-                // Creates the client-side engine entirely inside the browser
                 engine = await webllm.CreateMLCEngine(
                     selectedModel,
                     { initProgressCallback: updateAppConfig }
