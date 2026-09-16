@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Local AI Chatbot (Hugging Face SmolLM2)</title>
+    
+    <!-- Fixed: Inline baseline icon data to instantly clear the 404 favicon error -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://w3.org viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+
     <style>
         body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background-color: #f9f9f9; }
         #log { background: #eee; padding: 10px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ddd; }
@@ -14,15 +18,6 @@
         input { width: 65%; margin-right: 10px; }
         .control-group { margin-bottom: 20px; }
     </style>
-
-    <!-- Importmap resolves the dependencies explicitly without triggering standard CORS redirection blocks -->
-    <script type="importmap">
-        {
-            "imports": {
-                "@mlc-ai/webllm": "https://jsdelivr.net"
-            }
-        }
-    </script>
 </head>
 <body>
 
@@ -43,8 +38,8 @@
     <div id="output"></div>
 
     <script type="module">
-        // Import now works natively across Netlify sandboxes
-        import * as webllm from "@mlc-ai/webllm";
+        // Fixed: Bypasses standard CDN routing paths using a raw un-redirected ESM build structure
+        import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 
         const selectedModel = "SmolLM2-360M-Instruct-q4f16_1-MLC";
         let engine;
@@ -66,19 +61,19 @@
 
             if (!navigator.gpu) {
                 logDiv.innerText = "❌ WebGPU support is missing or restricted on this domain.\n\n" +
-                                   "If hosted on Netlify, you MUST create a '_headers' file with security rules to unlock your Chromebook GPU hardware.";
+                                   "Make sure your Netlify deployment includes the '_headers' file!";
                 initBtn.disabled = false;
                 return;
             }
             
-            logDiv.innerText = "WebGPU verified. Downloading model weights directly from Hugging Face storage...";
+            logDiv.innerText = "WebGPU verified. Accessing Hugging Face model storage...";
             
             try {
                 engine = await webllm.CreateMLCEngine(
                     selectedModel,
                     { initProgressCallback: updateAppConfig }
                 );
-                logDiv.innerText += "\n\n🎉 Success! Hugging Face Model is fully cached locally. You can safely disconnect your Wi-Fi now.";
+                logDiv.innerText += "\n\n🎉 Success! Hugging Face Model is cached. You can go offline now.";
                 promptInput.disabled = false;
                 sendBtn.disabled = false;
             } catch (err) {
