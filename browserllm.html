@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Local AI Chatbot (Hugging Face SmolLM2)</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+        #log { background: #eee; padding: 10px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px; margin-bottom: 10px; }
+        #output { padding: 15px; border: 1px solid #ccc; min-height: 100px; background: #fff; white-space: pre-wrap; }
+        button, input { padding: 10px; font-size: 16px; }
+        input { width: 70%; }
+    </style>
+</head>
+<body>
+
+    <h2>Local Browser-Based AI (Hugging Face)</h2>
+    <p>Status/Download Progress:</p>
+    <div id="log">Click "Initialize AI" to load Hugging Face SmolLM2 into cache...</div>
+
+    <button id="init-btn">1. Initialize AI</button>
+    <br><br>
+
+    <input type="text" id="prompt" value="Write a short poem about a Chromebook." disabled />
+    <button id="send-btn" disabled>2. Ask AI</button>
+
+    <h3>Response:</h3>
+    <div id="output"></div>
+
+    <!-- Import WebLLM from a High-Quality CDN -->
+    <script type="module">
+        import * as webllm from "https://esm.run";
+
+        // Switched to Hugging Face's ultra-lightweight SmolLM2-360M model
+        const selectedModel = "SmolLM2-360M-Instruct-q4f16_1-MLC";
+        let engine;
+
+        const logDiv = document.getElementById("log");
+        const outputDiv = document.getElementById("output");
+        const initBtn = document.getElementById("init-btn");
+        const sendBtn = document.getElementById("send-btn");
+        const promptInput = document.getElementById("prompt");
+
+        const updateAppConfig = (report) => {
+            logDiv.innerText += "\n" + report.text;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        };
+
+        initBtn.onclick = async () => {
+            initBtn.disabled = true;
+            logDiv.innerText = "Loading WebGPU Engine and pulling SmolLM2 from Hugging Face...";
+            
+            try {
+                // Creates the client-side engine entirely inside the browser
+                engine = await webllm.CreateMLCEngine(
+                    selectedModel,
+                    { initProgressCallback: updateAppConfig }
+                );
+                logDiv.innerText += "\n\n🎉 Hugging Face Model Ready! Go offline if you like.";
+                promptInput.disabled = false;
+                sendBtn.disabled = false;
+            } catch (err) {
+                logDiv.innerText += "\n\n❌ Error: " + err.message;
+                console.error(err);
+            }
+        };
+
+        sendBtn.onclick = async () => {
+            const text = promptInput.value;
+            outputDiv.innerText = "Thinking...";
+            
+            const messages = [{ role: "user", content: text }];
+            
+            try {
+                const chunks = await engine.chat.completions.create({
+                    messages,
+                    stream: true
+                });
+
+                outputDiv.innerText = "";
+                for await (const chunk of chunks) {
+                    const curDelta = chunk.choices?.delta?.content;
+                    if (curDelta) {
+                        outputDiv.innerText += curDelta;
+                    }
+                }
+            } catch (err) {
+                outputDiv.innerText = "Error generating text: " + err.message;
+            }
+        };
+    </script>
+</body>
+</html>
