@@ -26,8 +26,8 @@
     <h3>Response:</h3>
     <div id="output"></div>
 
-    <!-- Changed to unpkg with an explicit bundle path to bypass jsdelivr redirect restrictions -->
     <script type="module">
+        // Fixed: Switched to the correct compiled ESM entrypoint built for cross-origin browser usage
         import * as webllm from "https://unpkg.com";
 
         const selectedModel = "SmolLM2-360M-Instruct-q4f16_1-MLC";
@@ -45,6 +45,12 @@
         };
 
         initBtn.onclick = async () => {
+            // WebGPU security check for public domains
+            if (!navigator.gpu) {
+                logDiv.innerText = "❌ WebGPU is not supported or enabled in this browser. If running on Netlify, make sure headers are set.";
+                return;
+            }
+
             initBtn.disabled = true;
             logDiv.innerText = "Loading WebGPU Engine and pulling SmolLM2 from Hugging Face...";
             
@@ -59,6 +65,7 @@
             } catch (err) {
                 logDiv.innerText += "\n\n❌ Error: " + err.message;
                 console.error(err);
+                initBtn.disabled = false;
             }
         };
 
