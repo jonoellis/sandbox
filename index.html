@@ -2,33 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Local AI Chatbot (Hugging Face SmolLM2)</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
-        #log { background: #eee; padding: 10px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px; margin-bottom: 10px; }
-        #output { padding: 15px; border: 1px solid #ccc; min-height: 100px; background: #fff; white-space: pre-wrap; }
-        button, input { padding: 10px; font-size: 16px; }
-        input { width: 70%; }
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background-color: #f9f9f9; }
+        #log { background: #eee; padding: 10px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ddd; }
+        #output { padding: 15px; border: 1px solid #ccc; min-height: 100px; background: #fff; white-space: pre-wrap; border-radius: 4px; }
+        button, input { padding: 10px; font-size: 16px; border-radius: 4px; border: 1px solid #ccc; }
+        button { background-color: #0070f3; color: white; border: none; cursor: pointer; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        input { width: 65%; margin-right: 10px; }
+        .control-group { margin-bottom: 20px; }
     </style>
+
+    <!-- Importmap resolves the dependencies explicitly without triggering standard CORS redirection blocks -->
+    <script type="importmap">
+        {
+            "imports": {
+                "@mlc-ai/webllm": "https://jsdelivr.net"
+            }
+        }
+    </script>
 </head>
 <body>
 
     <h2>Local Browser-Based AI (Hugging Face)</h2>
-    <p>Status/Download Progress:</p>
-    <div id="log">Click "Initialize AI" to load Hugging Face SmolLM2 into cache...</div>
+    
+    <div class="control-group">
+        <p>Status / Download Progress:</p>
+        <div id="log">Click "Initialize AI" to pull Hugging Face SmolLM2 into cache...</div>
+        <button id="init-btn">1. Initialize AI</button>
+    </div>
 
-    <button id="init-btn">1. Initialize AI</button>
-    <br><br>
-
-    <input type="text" id="prompt" value="Write a short poem about a Chromebook." disabled />
-    <button id="send-btn" disabled>2. Ask AI</button>
+    <div class="control-group">
+        <input type="text" id="prompt" value="Write a short poem about a Chromebook." disabled />
+        <button id="send-btn" disabled>2. Ask AI</button>
+    </div>
 
     <h3>Response:</h3>
     <div id="output"></div>
 
     <script type="module">
-        // Fixed: Switched to the correct compiled ESM entrypoint built for cross-origin browser usage
-        import * as webllm from "https://unpkg.com";
+        // Import now works natively across Netlify sandboxes
+        import * as webllm from "@mlc-ai/webllm";
 
         const selectedModel = "SmolLM2-360M-Instruct-q4f16_1-MLC";
         let engine;
@@ -45,25 +61,28 @@
         };
 
         initBtn.onclick = async () => {
-            // WebGPU security check for public domains
+            initBtn.disabled = true;
+            logDiv.innerText = "Checking GPU hardware access...";
+
             if (!navigator.gpu) {
-                logDiv.innerText = "❌ WebGPU is not supported or enabled in this browser. If running on Netlify, make sure headers are set.";
+                logDiv.innerText = "❌ WebGPU support is missing or restricted on this domain.\n\n" +
+                                   "If hosted on Netlify, you MUST create a '_headers' file with security rules to unlock your Chromebook GPU hardware.";
+                initBtn.disabled = false;
                 return;
             }
-
-            initBtn.disabled = true;
-            logDiv.innerText = "Loading WebGPU Engine and pulling SmolLM2 from Hugging Face...";
+            
+            logDiv.innerText = "WebGPU verified. Downloading model weights directly from Hugging Face storage...";
             
             try {
                 engine = await webllm.CreateMLCEngine(
                     selectedModel,
                     { initProgressCallback: updateAppConfig }
                 );
-                logDiv.innerText += "\n\n🎉 Hugging Face Model Ready! Go offline if you like.";
+                logDiv.innerText += "\n\n🎉 Success! Hugging Face Model is fully cached locally. You can safely disconnect your Wi-Fi now.";
                 promptInput.disabled = false;
                 sendBtn.disabled = false;
             } catch (err) {
-                logDiv.innerText += "\n\n❌ Error: " + err.message;
+                logDiv.innerText += "\n\n❌ Initialization Failed: " + err.message;
                 console.error(err);
                 initBtn.disabled = false;
             }
@@ -71,7 +90,8 @@
 
         sendBtn.onclick = async () => {
             const text = promptInput.value;
-            outputDiv.innerText = "Thinking...";
+            outputDiv.innerText = "Generating local tokens...";
+            sendBtn.disabled = true;
             
             const messages = [{ role: "user", content: text }];
             
@@ -89,7 +109,9 @@
                     }
                 }
             } catch (err) {
-                outputDiv.innerText = "Error generating text: " + err.message;
+                outputDiv.innerText = "Generation Error: " + err.message;
+            } finally {
+                sendBtn.disabled = false;
             }
         };
     </script>
