@@ -1,0 +1,3 @@
+/*
+  # Baseline CSP for GTM + GA4 + Plausible. Switch to Content-Security-Policy to enforce.
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://plausible.io; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; frame-src https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'

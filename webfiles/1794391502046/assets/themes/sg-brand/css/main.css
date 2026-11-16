@@ -1,0 +1,20 @@
+/* Minimal stand-in for sg-brand main.css */
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#333}
+.ds_wrapper{max-width:1000px;margin:0 auto;padding:0 16px}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.fully-hidden{display:none!important}
+.ds_notification--cookie{background:#f8f8f8;border-bottom:4px solid #0065bd;padding:16px 0}
+.ds_notification--cookie-success{background:#0065bd;color:#fff;padding:12px 0}
+.ds_notification--cookie-success a{color:#fff}
+.ds_button{background:#0065bd;color:#fff;border:0;padding:10px 16px;cursor:pointer;font-size:1rem}
+.ds_button--secondary{background:#ebebeb;color:#333}
+.ds_button-group{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.ds_site-header{border-bottom:1px solid #ddd;padding:12px 0}
+.ds_site-branding__link{color:#0065bd;text-decoration:none;font-size:1.5rem}
+.category-upper{background:#0065bd;color:#fff;padding:32px 0}
+.ds_input{padding:10px;width:60%;max-width:400px}
+.popular__items{list-style:none;padding:0}
+.ds_card-grid{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.ds_card{border:1px solid #ddd;padding:16px}
+.ds_site-footer{background:#f0f0f0;padding:24px 0;margin-top:32px}
+.ds_site-footer__site-items{list-style:none;padding:0;display:flex;gap:16px;flex-wrap:wrap}
