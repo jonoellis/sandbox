@@ -1,14 +1,22 @@
-/* Reconstruction: replace with the real datalayer.js from mygov.scot if needed */
-(function () {
-  window.dataLayer = window.dataLayer || [];
-  var s = document.getElementById('gtm-datalayer') || document.currentScript;
-  if (!s) return;
-  window.dataLayer.push({
-    siteid: s.getAttribute('data-siteid'),
-    uuid: s.getAttribute('data-uuid'),
-    format: s.getAttribute('data-format'),
-    usertype: s.getAttribute('data-usertype'),
-    datecreated: s.getAttribute('data-datecreated'),
-    lastupdated: s.getAttribute('data-lastupdated')
-  });
-})();
+! function() {
+    const t = document.getElementById("gtm-datalayer");
+    if (!t) return;
+    const e = t.dataset.audience,
+        a = t.dataset.datecreated,
+        s = t.dataset.format,
+        d = t.dataset.lastupdated,
+        i = t.dataset.lifeevents,
+        r = t.dataset.reportingtags,
+        n = t.dataset.serviceproviders,
+        o = t.dataset.siteid,
+        l = t.dataset.topics,
+        u = t.dataset.usertype,
+        c = t.dataset.uuid;
+    window.dataLayer = window.dataLayer || [];
+    const p = {};
+
+    function g(t) {
+        return t && !!t.length
+    }
+    p["gtm.whitelist"] = ["google", "jsm", "lcl"], g(u) && (p.userType = u), g(e) && (p.audience = e), g(r) && (p.reportingTags = r.split("|")), g(i) && (p.lifeEvents = i.split("|")), g(n) && (p.serviceProviders = n.split("|")), g(s) && (p.format = s), g(o) && (p.siteid = o), g(l) && (p.topics = l.split("|")), g(d) && (p.lastUpdated = d), g(a) && (p.dateCreated = a), g(c) && (p.uuid = c), window.dataLayer.push(p)
+}();
